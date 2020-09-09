@@ -144,13 +144,13 @@ jobs:
       - name: Build Wapm binary
         run: |
           make build-wapm
-        if: github.ref == 'refs/heads/master' && ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ env.DOING_RELEASE }} == '1'
       - name: Package Wasmer
         run: |
           make package
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
-        if: github.ref == 'refs/heads/master' && ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ env.DOING_RELEASE }} == '1'
         with:
           name: wasmer-${{ matrix.os }}
           path: dist
