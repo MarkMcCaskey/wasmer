@@ -166,7 +166,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: VERSION
-          release_name: Release ${{ VERSION }}
+          release_name: Release VERSION
           draft: true # leaving this as a draft while this workflow is being developed
           prerelease: false
       - name: Upload Release Asset Windows
