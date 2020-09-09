@@ -171,7 +171,7 @@ jobs:
           prerelease: false
       - name: Upload Release Asset Windows
         if: $DOING_RELEASE == '1'
-        id: upload-release-asset 
+        id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -182,10 +182,10 @@ jobs:
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
         if: $DOING_RELEASE == '1'
-        id: upload-release-asset 
+        id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/wasmer-ubuntu/wasmer.tar.gz
@@ -193,10 +193,10 @@ jobs:
           asset_content_type: application/gzip
       - name: Upload Release Asset Mac
         if: $DOING_RELEASE == '1'
-        id: upload-release-asset 
+        id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: artifacts/wasmer-macos/wasmer.tar.gz
