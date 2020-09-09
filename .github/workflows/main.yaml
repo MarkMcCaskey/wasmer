@@ -144,7 +144,7 @@ jobs:
           make package
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
-        if: github.ref == 'refs/heads/master' && ${{ DOING_RELEASE }} == '1'
+        if: github.ref == 'refs/heads/master' && DOING_RELEASE == '1'
         with:
           name: wasmer-${{ matrix.os }}
           path: dist
@@ -154,23 +154,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download The Artifacts
-        if: ${{ DOING_RELEASE }} == '1'
+        if: DOING_RELEASE == '1'
         uses: actions/download-artifact@v2
         with:
           path: artifacts
       - name: Create Release
-        if: ${{ DOING_RELEASE }} == '1'
+        if: DOING_RELEASE == '1'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ VERSION }}
+          tag_name: VERSION
           release_name: Release ${{ VERSION }}
           draft: true # leaving this as a draft while this workflow is being developed
           prerelease: false
       - name: Upload Release Asset Windows
-        if: ${{ DOING_RELEASE }} == '1'
+        if: DOING_RELEASE == '1'
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
@@ -181,7 +181,7 @@ jobs:
           asset_name: wasmer-windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
-        if: ${{ DOING_RELEASE }} == '1'
+        if: DOING_RELEASE == '1'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -192,7 +192,7 @@ jobs:
           asset_name: wasmer-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Mac
-        if: ${{ DOING_RELEASE }} == '1'
+        if: DOING_RELEASE == '1'
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
