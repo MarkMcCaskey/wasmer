@@ -138,7 +138,7 @@ jobs:
       - name: Build Wapm binary
         run: |
           make build-wapm
-        if: github.ref == 'refs/heads/master' && ${{ DOING_RELEASE }} == '1'
+        if: github.ref == 'refs/heads/master' && DOING_RELEASE == '1'
       - name: Package Wasmer
         run: |
           make package
