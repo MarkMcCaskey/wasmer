@@ -146,8 +146,8 @@ jobs:
         uses: actions/upload-artifact@v2
         if: github.ref == 'refs/heads/master' && $DOING_RELEASE == '1'
         with:
-          - name: wasmer-${{ matrix.os }}
-          - path: dist
+          name: wasmer-${{ matrix.os }}
+          path: dist
 
   release:
     needs: test
