@@ -34,7 +34,7 @@ jobs:
         id: get_version
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=DOING_RELEASE::$((echo '1.0.0-alpha1.0' | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
+          echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
   test:
     name: Test on ${{ matrix.build }}
     runs-on: ${{ matrix.os }}
@@ -129,7 +129,8 @@ jobs:
       - name: Set up dependencies for Mac OS
         run: brew install automake
         if: matrix.os == 'macos-latest'
-      - run: make test
+      # commented out to speed up iteration
+      #- run: make test
       - name: Build and Test C API
         run: |
           make build-capi
@@ -156,15 +157,14 @@ jobs:
           path: dist
 
   release:
-    needs: [setup, test]
+    needs: test
     runs-on: ubuntu-latest
     steps:
       # we have to rerun this it seems
       - name: Set up env vars
-        id: get_version
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=DOING_RELEASE::$((echo '1.0.0-alpha1.0' | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
+          echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
       - name: Download The Artifacts
         if: ${{ env.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
