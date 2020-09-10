@@ -35,12 +35,12 @@ jobs:
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
-          echo $VERSION
-          echo $DOING_RELEASE
+          echo ${{ env.VERSION }}
+          echo ${{ env.DOING_RELEASE }}
       - name: Double checking
         run: |
-          echo $VERSION
-          echo $DOING_RELEASE
+          echo ${{ env.VERSION }}
+          echo ${{ env.DOING_RELEASE }}
   test:
     name: Test on ${{ matrix.build }}
     runs-on: ${{ matrix.os }}
@@ -139,8 +139,8 @@ jobs:
       #- run: make test
       - name: Double checking
         run: |
-          echo $VERSION
-          echo $DOING_RELEASE
+          echo ${{ env.VERSION }}
+          echo ${{ env.DOING_RELEASE }}
       - name: Build and Test C API
         run: |
           make build-capi
@@ -175,8 +175,8 @@ jobs:
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
-          echo $VERSION
-          echo $DOING_RELEASE
+          echo ${{ env.VERSION }}
+          echo ${{ env.DOING_RELEASE }}
       - name: Double checking
         run: |
           echo $VERSION
