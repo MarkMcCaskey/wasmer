@@ -29,6 +29,9 @@ jobs:
   setup:
     name: Set up
     runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.setup.outputs.VERSION }}
+      DOING_RELEASE: ${{ steps.setup.outputs.DOING_RELEASE }}
     steps:
       - name: Set up env vars
         id: setup
