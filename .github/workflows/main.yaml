@@ -141,8 +141,8 @@ jobs:
       #- run: make test
       - name: Double checking
         run: |
-          echo ${{ steps.setup.outputs.VERSION }}
-          echo ${{ steps.setup.outputs.DOING_RELEASE }}
+          echo ${{ needs.setup.outputs.VERSION }}
+          echo ${{ needs.setup.outputs.DOING_RELEASE }}
       - name: Build and Test C API
         run: |
           make build-capi
@@ -157,43 +157,43 @@ jobs:
       - name: Build Wapm binary
         run: |
           make build-wapm
-        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
       - name: Package Wasmer
         run: |
           make package
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
-        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         with:
           name: wasmer-${{ matrix.os }}
           path: dist
 
   release:
-    needs: test
+    needs: [setup, test]
     runs-on: ubuntu-latest
     steps:
       - name: Double checking
         run: |
-          echo ${{ steps.setup.outputs.VERSION }}
-          echo ${{ steps.setup.outputs.DOING_RELEASE }}
+          echo ${{ needs.setup.outputs.VERSION }}
+          echo ${{ needs.setup.outputs.DOING_RELEASE }}
       - name: Download The Artifacts
         if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
         with:
           path: artifacts
       - name: Create Release
-        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.setup.output.VERSION }}
+          tag_name: ${{ needs.setup.outputs.VERSION }}
           release_name: Release ${{ steps.setup.output.VERSION }}
           draft: true # leaving this as a draft while this workflow is being developed
           prerelease: false
       - name: Upload Release Asset Windows
-        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
@@ -204,7 +204,7 @@ jobs:
           asset_name: wasmer-windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
-        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -215,7 +215,7 @@ jobs:
           asset_name: wasmer-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Mac
-        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
+        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
