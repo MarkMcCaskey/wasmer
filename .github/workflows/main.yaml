@@ -143,18 +143,6 @@ jobs:
         if: matrix.os == 'macos-latest'
       # commented out to speed up iteration
       #- run: make test
-      - name: Double checking
-        run: |
-          echo ${{ needs.setup.outputs.VERSION }}
-          echo ${{ needs.setup.outputs.DOING_RELEASE }}
-      - name: env var debug
-        if: needs.setup.outputs.DOING_RELEASE == 1
-        run: |
-          echo "raw number is correct"
-      - name: env var debug2
-        if: needs.setup.outputs.DOING_RELEASE == '1'
-        run: |
-          echo "string is correct"
       - name: Build and Test C API
         run: |
           make build-capi
@@ -185,10 +173,6 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.setup.outputs.DOING_RELEASE == '1'
     steps:
-      - name: Double checking
-        run: |
-          echo ${{ needs.setup.outputs.VERSION }}
-          echo ${{ needs.setup.outputs.DOING_RELEASE }}
       - name: Download The Artifacts
         uses: actions/download-artifact@v2
         with:
@@ -197,7 +181,7 @@ jobs:
         shell: bash
         run: |
           ls .
-          ls arifacts
+          ls artifacts
           ls artifacts/*
       - name: Create Release
         id: create_release
@@ -216,9 +200,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: artifacts/wasmer-windows/wasmer-windows.exe
-          asset_name: wasmer-windows.exe
-          asset_content_type: application/vnd.microsoft.portable-executable
+          asset_path: artifacts/wasmer-windows-latest
+          asset_name: wasmer-windows.zip
+          asset_content_type: application/zip
+          #asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
@@ -226,9 +211,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/wasmer-ubuntu/wasmer.tar.gz
-          asset_name: wasmer-linux-amd64.tar.gz
-          asset_content_type: application/gzip
+          asset_path: artifacts/wasmer-ubuntu-latest
+          asset_name: wasmer-linux-amd64.zip
+          asset_content_type: application/zip
       - name: Upload Release Asset Mac
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
@@ -236,9 +221,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/wasmer-macos/wasmer.tar.gz
-          asset_name: wasmer-darwin-amd64.tar.gz
-          asset_content_type: application/gzip
+          asset_path: artifacts/wasmer-macos-latest
+          asset_name: wasmer-darwin-amd64.zip
+          asset_content_type: application/zip
 
 
 
