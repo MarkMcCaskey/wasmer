@@ -32,11 +32,12 @@ jobs:
     steps:
       - name: Set up env vars
         id: get_version
+        shell: bash
         run: |
           echo ::set-env name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-env name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
-          echo ${{ env.VERSION }}
-          echo ${{ env.DOING_RELEASE }}
+          echo ::set-env name=DOING_RELEASE::${(echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?}
+          echo $VERSION
+          echo $DOING_RELEASE
       - name: Double checking
         run: |
           echo ${{ env.VERSION }}
