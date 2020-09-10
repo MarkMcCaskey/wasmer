@@ -35,6 +35,12 @@ jobs:
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
+          echo $VERSION
+          echo $DOING_RELEASE
+      - name: Double checking
+        run: |
+          echo $VERSION
+          echo $DOING_RELEASE
   test:
     name: Test on ${{ matrix.build }}
     runs-on: ${{ matrix.os }}
@@ -131,6 +137,10 @@ jobs:
         if: matrix.os == 'macos-latest'
       # commented out to speed up iteration
       #- run: make test
+      - name: Double checking
+        run: |
+          echo $VERSION
+          echo $DOING_RELEASE
       - name: Build and Test C API
         run: |
           make build-capi
@@ -165,6 +175,12 @@ jobs:
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
+          echo $VERSION
+          echo $DOING_RELEASE
+      - name: Double checking
+        run: |
+          echo $VERSION
+          echo $DOING_RELEASE
       - name: Download The Artifacts
         if: ${{ env.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
