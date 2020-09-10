@@ -31,18 +31,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up env vars
-        id: get_version
+        id: setup
         shell: bash
         run: |
-          echo ::set-env name=VERSION::${GITHUB_REF/refs\/tags\//}
-          export DR=$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
-          echo ::set-env name=DOING_RELEASE::${DR}
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          DOING_RELEASE=$(echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?' && echo -n '1' || echo -n '0')
+          echo ::set-output name=DOING_RELEASE::${DOING_RELEASE}
           echo $VERSION
           echo $DOING_RELEASE
       - name: Double checking
         run: |
-          echo ${{ env.VERSION }}
-          echo ${{ env.DOING_RELEASE }}
+          echo ${{ steps.setup.outputs.VERSION }}
+          echo ${{ steps.setup.outputs.DOING_RELEASE }}
   test:
     name: Test on ${{ matrix.build }}
     runs-on: ${{ matrix.os }}
@@ -141,8 +141,8 @@ jobs:
       #- run: make test
       - name: Double checking
         run: |
-          echo ${{ env.VERSION }}
-          echo ${{ env.DOING_RELEASE }}
+          echo ${{ steps.setup.outputs.VERSION }}
+          echo ${{ steps.setup.outputs.DOING_RELEASE }}
       - name: Build and Test C API
         run: |
           make build-capi
@@ -157,13 +157,13 @@ jobs:
       - name: Build Wapm binary
         run: |
           make build-wapm
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
       - name: Package Wasmer
         run: |
           make package
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
         with:
           name: wasmer-${{ matrix.os }}
           path: dist
@@ -172,35 +172,28 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      # we have to rerun this it seems
-      - name: Set up env vars
-        run: |
-          echo ::set-env name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-env name=DOING_RELEASE::$((echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?') && echo $?)
-          echo ${{ env.VERSION }}
-          echo ${{ env.DOING_RELEASE }}
       - name: Double checking
         run: |
-          echo $VERSION
-          echo $DOING_RELEASE
+          echo ${{ steps.setup.outputs.VERSION }}
+          echo ${{ steps.setup.outputs.DOING_RELEASE }}
       - name: Download The Artifacts
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ stesp.setup.outputs.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
         with:
           path: artifacts
       - name: Create Release
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
+          tag_name: ${{ steps.setup.output.VERSION }}
+          release_name: Release ${{ steps.setup.output.VERSION }}
           draft: true # leaving this as a draft while this workflow is being developed
           prerelease: false
       - name: Upload Release Asset Windows
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
@@ -211,7 +204,7 @@ jobs:
           asset_name: wasmer-windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -222,7 +215,7 @@ jobs:
           asset_name: wasmer-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Mac
-        if: ${{ env.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.output.DOING_RELEASE }} == '1'
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
