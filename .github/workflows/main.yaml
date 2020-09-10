@@ -177,7 +177,7 @@ jobs:
           echo ${{ steps.setup.outputs.VERSION }}
           echo ${{ steps.setup.outputs.DOING_RELEASE }}
       - name: Download The Artifacts
-        if: ${{ stesp.setup.outputs.DOING_RELEASE }} == '1'
+        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
         with:
           path: artifacts
