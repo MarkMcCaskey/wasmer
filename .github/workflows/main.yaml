@@ -147,6 +147,14 @@ jobs:
         run: |
           echo ${{ needs.setup.outputs.VERSION }}
           echo ${{ needs.setup.outputs.DOING_RELEASE }}
+      - name: env var debug
+        if: needs.setup.outputs.DOING_RELEASE == 1
+        run: |
+          echo "raw number is correct"
+      - name: env var debug2
+        if: needs.setup.outputs.DOING_RELEASE == '1'
+        run: |
+          echo "string is correct"
       - name: Build and Test C API
         run: |
           make build-capi
@@ -161,13 +169,13 @@ jobs:
       - name: Build Wapm binary
         run: |
           make build-wapm
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
+        if: needs.setup.outputs.DOING_RELEASE == '1'
       - name: Package Wasmer
         run: |
           make package
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
+        if: needs.setup.outputs.DOING_RELEASE == '1'
         with:
           name: wasmer-${{ matrix.os }}
           path: dist
@@ -175,18 +183,23 @@ jobs:
   release:
     needs: [setup, test]
     runs-on: ubuntu-latest
+    if: needs.setup.outputs.DOING_RELEASE == '1'
     steps:
       - name: Double checking
         run: |
           echo ${{ needs.setup.outputs.VERSION }}
           echo ${{ needs.setup.outputs.DOING_RELEASE }}
       - name: Download The Artifacts
-        if: ${{ steps.setup.outputs.DOING_RELEASE }} == '1'
         uses: actions/download-artifact@v2
         with:
           path: artifacts
+      - name: Debug downloaded artifacts
+        shell: bash
+        run: |
+          ls .
+          ls arifacts
+          ls artifacts/*
       - name: Create Release
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -197,7 +210,6 @@ jobs:
           draft: true # leaving this as a draft while this workflow is being developed
           prerelease: false
       - name: Upload Release Asset Windows
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
@@ -208,7 +220,6 @@ jobs:
           asset_name: wasmer-windows.exe
           asset_content_type: application/vnd.microsoft.portable-executable
       - name: Upload Release Asset Linux
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -219,7 +230,6 @@ jobs:
           asset_name: wasmer-linux-amd64.tar.gz
           asset_content_type: application/gzip
       - name: Upload Release Asset Mac
-        if: ${{ needs.setup.outputs.DOING_RELEASE }} == '1'
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
