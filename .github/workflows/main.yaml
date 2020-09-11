@@ -39,7 +39,7 @@ jobs:
         run: |
           VERSION=${GITHUB_REF/refs\/tags\//}
           echo ::set-output name=VERSION::${VERSION}
-          DOING_RELEASE=$(echo $VERSION | grep -q '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?' && echo -n '1' || echo -n '0')
+          DOING_RELEASE=$(echo $VERSION | grep -c '[0-9]\+\.[0-9]\+\.[0-9]\+\(-.*\)\?')
           echo ::set-output name=DOING_RELEASE::${DOING_RELEASE}
           echo $VERSION
           echo $DOING_RELEASE
